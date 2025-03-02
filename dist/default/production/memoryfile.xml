@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project>
-  <executable name="dist/default/production/TimerProject.X.production.elf">
+  <executable name="dist/default/production/0x02-timers-main.production.elf">
     <memory name="data">
       <units>bytes</units>
       <length>53248</length>
@@ -11,8 +11,8 @@
     <memory name="program">
       <units>bytes</units>
       <length>524544</length>
-      <used>1203</used>
-      <free>523341</free>
+      <used>1305</used>
+      <free>523239</free>
     </memory>
   </executable>
 </project>

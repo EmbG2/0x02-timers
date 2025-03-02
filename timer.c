@@ -65,8 +65,8 @@ void tmr_wait_period(int timer){
 }
 
 void tmr_wait_ms(int timer, int ms){
-    void tmr_setup_period(timer, ms);
-    void tmr_wait_period(timer);
+    tmr_setup_period(timer, ms);
+    tmr_wait_period(timer);
     if (timer == TIMER1){
         T1CONbits.TON = 0;
     } else if (timer == TIMER2){
@@ -76,50 +76,57 @@ void tmr_wait_ms(int timer, int ms){
 
 int tmr_wait_period_3(int timer){
     int expired = 0;
-    case TIMER1:
-        expired = IFS0bits.T1IF;
-        IFS0bits.T1IF = 0;
-        while (!IFS0bits.T1IF);
-        IFS0bits.T1IF = 0;
-        break;
-    case TIMER2:
-        expired = IFS0bits.T2IF;
-        IFS0bits.T2IF = 0;
-        while (!IFS0bits.T2IF);
-        IFS0bits.T2IF = 0;
-        break;
-//    switch (timer){
-//        case TIMER1:
-//            if (IFS0bits.T1IF == 1) { 
-//                expired = 1;
-//            }
-//            IFS0bits.T1IF = 0;
-//            while (IFS0bits.T1IF == 0); // Wait for period
-//            IFS0bits.T1IF = 0;
-//            break;
-//        case TIMER2:
-//            if (IFS0bits.T2IF == 1) { // Timer already expired
-//                expired = 1;
-//            }
-//            IFS0bits.T2IF = 0;
-//            while (IFS0bits.T2IF == 0); // Wait for period
-//            IFS0bits.T2IF = 0;
-//            break;
-//    }
+    switch(timer) {
+        case TIMER1:
+            expired = IFS0bits.T1IF;
+            if (expired) {
+                IFS0bits.T1IF = 0; // Clear flag after detecting it
+            }
+            break;
+        case TIMER2:
+            expired = IFS0bits.T2IF;
+            if (expired) {
+                IFS0bits.T2IF = 0; // Clear flag after detecting it
+            }
+            break;
+    }
     return expired;
 }
 
+
+//        int num_times = ms/200;
+//        for (int i = 0; i < num_times; i++) {
+//            tmr_setup_period(timer, 200);
+//        }
+//        tmr_setup_period(timer, ms - num_times*200);
+        
 void tmr_wait_ms_3(int timer, int ms){
     int expired;
+
     while (ms > 0) {
         int wait_time = (ms > 200) ? 200 : ms; 
         tmr_setup_period(timer, wait_time);
-        expired = tmr_wait_period_3(timer);
+        
+        // Clear the interrupt flag before waiting
+        if (timer == TIMER1) {
+            IFS0bits.T1IF = 0;
+        } else if (timer == TIMER2) {
+            IFS0bits.T2IF = 0;
+        }
+        
+        // Wait until timer expires
+        do {
+            expired = tmr_wait_period_3(timer);
+        } while (expired == 0);
+
+        // Stop the timer after waiting
+        if (timer == TIMER1){
+            T1CONbits.TON = 0;
+        } else if (timer == TIMER2){
+            T2CONbits.TON = 0;
+        }
+
         ms -= wait_time;
     }
-    if (timer == TIMER1){  // this is probably not necessary
-        T1CONbits.TON = 0;
-    } else if (timer == TIMER2){
-        T2CONbits.TON = 0;
-    }
 }
+
