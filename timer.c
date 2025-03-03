@@ -11,37 +11,44 @@
 #define FCY 72000000UL
 
 void tmr_setup_period(int timer, int ms) {
-    unsigned int prescaler, period;
+    unsigned int prescaler;
+    double period;
     if (ms > 200){
         ms = 200;
     }
-    if (ms > 50){
-        prescaler = 256;
-    } else if (ms > 10){
-        prescaler = 64;
-    } else if (ms > 2){
-        prescaler = 8;
-    } else{  // Note: also counts for negative ms, set PS to default 1
-        prescaler = 1;
-    } 
     
-    period  = (FCY / (prescaler * 1000)) * ms;
+    prescaler = 1;
+    int prescaler_type = 0;
+    if(ms > 2) {
+        prescaler *= 8;     // 8
+        prescaler_type++;   // 1
+    }
+    if(ms > 10) {
+        prescaler *= 8;     // 64
+        prescaler_type++;   // 2
+    }
+    if(ms > 50) {
+        prescaler *= 4;     // 256
+        prescaler_type++;   // 3
+    }
+    
+    // <f_tick> = f_clock / prescaler = <1 / T_tick>
+    // Period of the timer with respect to the period of the tick
+    // <period> = duration / (T_tick * 1000)
+    // it is divided by 1000 to convert from seconds to milliseconds
+    period  = (double)(FCY * ms) / (prescaler * 1000L);
     
     switch(timer){
         case TIMER1:
             T1CONbits.TON = 0;
-            T1CONbits.TCKPS =   (prescaler == 256)?3:
-                                (prescaler == 64)?2:
-                                (prescaler == 8)?1:0;
+            T1CONbits.TCKPS = prescaler_type;
             PR1 = period;
-            TMR1 = 0;
+            TMR1 = 0; // Reset the number of tick counted by the timer
             T1CONbits.TON = 1;
             break;
         case TIMER2:
             T2CONbits.TON = 0;
-            T2CONbits.TCKPS =   (prescaler == 256)?3:
-                                (prescaler == 64)?2:
-                                (prescaler == 8)?1:0;
+            T2CONbits.TCKPS = prescaler_type;
             PR2 = period;
             TMR2 = 0;
             T2CONbits.TON = 1;
@@ -52,12 +59,10 @@ void tmr_setup_period(int timer, int ms) {
 void tmr_wait_period(int timer){
     switch (timer){
         case TIMER1:
-            IFS0bits.T1IF = 0;
             while (IFS0bits.T1IF == 0);
             IFS0bits.T1IF = 0;
             break;
         case TIMER2:
-            IFS0bits.T2IF = 0;
             while (IFS0bits.T2IF == 0);
             IFS0bits.T2IF = 0;
             break;

@@ -29,15 +29,14 @@ int main(void) {
     
     // ASSIGNMENT PART 3
     TRISGbits.TRISG9 = 0;
+    LATAbits.LATA0 = 0;
     tmr_setup_period(TIMER1, 200);
+    
     int delay = 1000;
-    int blink = 100;
     int ret;
     while (ASSIGNMENT_N == 3){
         tmr_wait_ms_3(TIMER2, delay);
-        LATAbits.LATA0 = 1;
-        tmr_wait_ms_3(TIMER2, blink);
-        LATAbits.LATA0 = 0;
+        LATAbits.LATA0 ^= 1;
         ret = tmr_wait_period_3(TIMER1);
         if (ret){
             LATGbits.LATG9 = 1;
