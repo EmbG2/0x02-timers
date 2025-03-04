@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=0x02-timers-main
+PROJECTNAME=TimerProject.X
 
 # Active Configuration
 DEFAULTCONF=default

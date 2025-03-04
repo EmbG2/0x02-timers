@@ -6,5 +6,5 @@
 CND_BASEDIR=`pwd`
 # default configuration
 CND_ARTIFACT_DIR_default=dist/default/production
-CND_ARTIFACT_NAME_default=0x02-timers-main.production.hex
-CND_ARTIFACT_PATH_default=dist/default/production/0x02-timers-main.production.hex
+CND_ARTIFACT_NAME_default=TimerProject.X.production.hex
+CND_ARTIFACT_PATH_default=dist/default/production/TimerProject.X.production.hex

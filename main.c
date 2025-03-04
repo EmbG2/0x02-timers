@@ -29,10 +29,8 @@ int main(void) {
     
     // ASSIGNMENT PART 3
     TRISGbits.TRISG9 = 0;
-    LATAbits.LATA0 = 0;
     tmr_setup_period(TIMER1, 200);
-    
-    int delay = 1000;
+    int delay = 2000;
     int ret;
     while (ASSIGNMENT_N == 3){
         tmr_wait_ms_3(TIMER2, delay);
@@ -40,13 +38,16 @@ int main(void) {
         ret = tmr_wait_period_3(TIMER1);
         if (ret){
             LATGbits.LATG9 = 1;
-            T1CONbits.TON = 0;
         } else{
             LATGbits.LATG9 = 0;
-            T1CONbits.TON = 0;
-            TMR1 =0;
-            T1CONbits.TON = 1;
         }
+        T1CONbits.TON = 0;
+        TMR1 =0;
+        T1CONbits.TON = 1;
     }
+    
+    T1CONbits.TON = 0;
+    T2CONbits.TON = 0; 
+    
     return 0;
 }
